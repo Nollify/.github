@@ -1,0 +1,19 @@
+name: Welcome New Contributors
+on:
+  pull_request:
+    types: [opened]
+  issues:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome new contributors
+        run: |
+          author=$(jq -r .pull_request.user.login $GITHUB_EVENT_PATH)
+          is_first_contribution=$(curl -s https://api.github.com/repos/Nollify/Nollify-client/contributors | jq -r ".[] | select(.login == \"$author\") | .login")
+
+          if [ -z "$is_first_contribution" ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body "🎉 Welcome @${{ github.event.pull_request.user.login }} to the Nollify community! We’re excited to have you contribute."
+          fi
