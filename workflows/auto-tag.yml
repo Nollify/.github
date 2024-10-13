@@ -1,0 +1,19 @@
+name: Auto Tag Issues and Discussions
+on:
+  issues:
+    types: [opened, edited]
+  discussion:
+    types: [created, edited]
+
+jobs:
+  tag_discussion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-tag issues and discussions based on keywords
+        run: |
+          issue_body=${{ github.event.issue.body }}
+          if echo "$issue_body" | grep -iq 'bug'; then
+            gh issue edit ${{ github.event.issue.number }} --add-label "bug"
+          elif echo "$issue_body" | grep -iq 'feature'; then
+            gh issue edit ${{ github.event.issue.number }} --add-label "feature-request"
+          fi
