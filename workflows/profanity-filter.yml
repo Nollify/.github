@@ -1,0 +1,21 @@
+name: Profanity Filter
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  check_profanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for profanity in issue or discussion comments
+        run: |
+          curl -X GET "https://www.purgomalum.com/service/containsprofanity?text=${{ github.event.comment.body }}" > profanity_check.txt
+          profanity=$(cat profanity_check.txt)
+          if [ "$profanity" = "true" ]; then
+            echo "Profanity detected."
+            # Notify the user and label the issue or discussion as 'inappropriate'
+            gh issue comment ${{ github.event.issue.number }} --body "🚫 Please refrain from using offensive language. Your comment has been flagged."
+            gh issue edit ${{ github.event.issue.number }} --add-label "inappropriate"
+          fi
