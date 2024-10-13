@@ -1,0 +1,16 @@
+name: Auto Assign Default Label
+on:
+  issues:
+    types: [opened]
+  discussion:
+    types: [created]
+
+jobs:
+  auto_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-assign label
+        run: |
+          if [ -z "${{ github.event.issue.labels }}" ]; then
+            gh issue edit ${{ github.event.issue.number }} --add-label "needs-review"
+          fi
